@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      @font-face {
+        font-family: EastmanGrotesque;
+        font-weight: bold;
+        src: url("font.otf") format("opentype");
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      body {
+        box-sizing: border-box;
+        background-color: #f0f9ff;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+          'Segoe UI Symbol', 'Noto Color Emoji';
+        color: #1e293b;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        padding: 2rem;
+      }
+      #ironyAlert {
+        display: none;
+        background: #fff7ed;
+        border-top-width: 4px;
+        border-top-style: solid;
+        border-top-color: #fdba74;
+        color: #7c2d12;
+        border-radius: 0.25rem 0.25rem 0 0;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      }
+
+      .alert-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .alert-icon > svg {
+        fill: currentColor;
+        height: 1.5rem;
+        width: 1.5rem;
+        text: #f97316;
+        margin-right: 1rem;
+      }
+
+      .alert-text-heading {
+        font-weight: 700;
+      }
+
+      .alert-text-desc {
+        font-size: 0.875rem; /* 14px */
+        line-height: 1.25rem; /* 20px */
+      }
+
+      #ironyConfidence {
+        font-weight: 700;
+      }
+
+      /* h1 {
+        display: inline-block;
+        position: relative;
+        text-decoration: none;
+        color: inherit;
+        z-index: 1;
+      } */
+
+      /* h1:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -0.4em;
+        height: 0.2em;
+        width: 100%;
+        background: linear-gradient(110deg, #e1f549, #29d0be, #6cb8ea, #ff5959);
+        z-index: -1;
+        transition: height 0.25s cubic-bezier(0.6, 0, 0.4, 1);
+      } */
+
+      .emotions-list-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .emotion-indicator-label {
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+      }
+
+      .emotion-indicator-confidence {
+        font-size: 0.75rem;
+        color: #6b7280;
+      }
+
+      .emotion-indicator-bar-outer {
+        width: 100%;
+        background: #e5e7eb;
+        margin-bottom: 1rem;
+        height: 0.625rem;
+        border-radius: 9999px;
+      }
+
+      .emotion-indicator-bar-inner {
+        background: #51ABA8;
+        height: 0.625rem;
+        border-radius: 9999px;
+      }
+
+      #showAllEmotionsBtn {
+        background: none;
+        border: 1px solid #51ABA8;
+        border-radius: 0.375rem;
+        color: #51ABA8;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+      }
+
+      #showAllEmotionsBtn:hover {
+        background: #51ABA8;
+        color: #f9fafb;
+      }
+
+      #hideUncertainEmotionsBtn {
+        display: none;
+        background: none;
+        border: 1px solid #51ABA8;
+        border-radius: 0.375rem;
+        color: #51ABA8;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+      }
+
+      #hideUncertainEmotionsBtn:hover {
+        background: #51ABA8;
+        color: #f9fafb;
+      }
+
+      #closeBtn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: none;
+        border: none;
+        color: #6b7280;
+        font-size: 2rem;
+        cursor: pointer;
+      }
+      #closeBtn:hover {
+        color: #1f2937;
+      }
+      #closeBtn::before {
+        content: '\00d7';
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      <img src="kaleidoscope_logo.png" style="height: 2em;"></img>
+    </h1>
+    <p><b>Scanned text:</b> "<span id="selection"></span>"</p>
+    <div id="ironyAlert" role="alert">
+      <div class="alert-container">
+        <div class="alert-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path
+              d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"
+            />
+          </svg>
+        </div>
+        <div class="alert-text">
+          <p class="alert-text-heading">Possible verbal irony detected in the text</p>
+          <p class="alert-text-desc">
+            Our AI systems have detected verbal irony with a confidence of
+            <span id="ironyConfidence"></span>%.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="emotions-list">
+      <div class="emotions-list-header">
+        <h2>Top Emotions</h2>
+        <button id="showAllEmotionsBtn">Show all</button>
+        <button id="hideUncertainEmotionsBtn">Hide uncertain</button>
+      </div>
+      <div id="emotions"></div>
+    </div>
+    <button id="closeBtn"></button>
+    <script src="popup.js"></script>
+  </body>
+</html>
